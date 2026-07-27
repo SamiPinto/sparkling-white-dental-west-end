@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Questrial } from "next/font/google";
-import { BIZ, SERVICES } from "./data";
+import { BIZ, FAQS } from "./data";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -18,38 +18,42 @@ const questrial = Questrial({
   display: "swap",
 });
 
-// Canonical page for the West End practice. Update if this deploys elsewhere.
-const CANONICAL =
-  "https://www.sparklingwhitedental.com.au/locations/west-ends-local-dentists/";
+// CONFIRM BEFORE GO-LIVE: canonical URL for this veneers landing page.
+// Must match wherever the page is actually deployed.
+const CANONICAL = "https://www.sparklingwhitedental.com.au/west-end-veneers/";
+// TODO: swap for a veneers-specific social image when one is available.
 const OG_IMAGE =
   "https://www.sparklingwhitedental.com.au/wp-content/uploads/2025/07/Dentist-West-End-1024x683.jpg";
 
+const TITLE = "Porcelain Veneers West End | Sparkling White Dental";
+const DESCRIPTION =
+  "Custom porcelain veneers in West End, Brisbane. See real before & after results. Flexible payment plans. Book your free consultation today.";
+
 export const metadata: Metadata = {
   metadataBase: new URL("https://www.sparklingwhitedental.com.au"),
-  title: "West End Dentist Brisbane | Sparkling White Dental",
-  description:
-    "Trusted family dentist in West End, Brisbane for 45 years. General, cosmetic & emergency dentistry, implants & orthodontics. Interest-free payment plans.",
+  title: TITLE,
+  description: DESCRIPTION,
   keywords: [
-    "dentist West End",
-    "West End dentist Brisbane",
-    "emergency dentist West End",
-    "family dentist Brisbane",
-    "dental implants West End",
-    "teeth whitening Brisbane",
-    "children's dentist West End",
-    "dentist near Brisbane CBD",
+    "veneers West End",
+    "porcelain veneers West End",
+    "composite veneers West End",
+    "dental veneers West End Brisbane",
+    "cosmetic dentist West End",
+    "smile makeover West End",
+    "fix chipped teeth West End",
+    "veneers cost Brisbane",
   ],
-  authors: [{ name: "Sparkling White Dental" }],
-  creator: "Sparkling White Dental",
-  publisher: "Sparkling White Dental",
+  authors: [{ name: BIZ.name }],
+  creator: BIZ.name,
+  publisher: BIZ.name,
   category: "Dentist",
   alternates: { canonical: CANONICAL },
   openGraph: {
-    title: "West End's Local Dentists | Sparkling White Dental",
+    title: TITLE,
     description:
-      "45 years serving West End, Brisbane. Comprehensive, gentle dental care under one roof. Interest-free payment plans available.",
+      "Custom porcelain veneers in West End — fix chips, gaps and staining. Real before & after results, flexible payment plans, free consultation.",
     url: CANONICAL,
-    siteName: "Sparkling White Dental",
+    siteName: BIZ.name,
     type: "website",
     locale: "en_AU",
     images: [
@@ -57,15 +61,14 @@ export const metadata: Metadata = {
         url: OG_IMAGE,
         width: 1024,
         height: 683,
-        alt: "The Sparkling White Dental team at the West End clinic",
+        alt: `Dr Bikramjit at ${BIZ.name}, ${BIZ.location}`,
       },
     ],
   },
   twitter: {
     card: "summary_large_image",
-    title: "West End's Local Dentists | Sparkling White Dental",
-    description:
-      "Your trusted family dentist in West End, Brisbane for 45 years. Book online or call (07) 3844 2125.",
+    title: TITLE,
+    description: `Porcelain veneers in West End. Book your free consultation — call ${BIZ.phone}.`,
     images: [OG_IMAGE],
   },
   robots: {
@@ -81,14 +84,12 @@ export const viewport: Viewport = {
   themeColor: "#0082b3",
 };
 
-const jsonLd = {
-  "@context": "https://schema.org",
+const dentistLd = {
   "@type": "Dentist",
   "@id": `${CANONICAL}#dentist`,
-  name: "Sparkling White Dental — West End",
-  alternateName: "West End's Local Dentists",
+  name: `${BIZ.name} — ${BIZ.location}`,
   description:
-    "Trusted family dentist in West End, Brisbane for 45 years. General, cosmetic and emergency dentistry, implants, orthodontics and children's dentistry, led by Dr. Bik.",
+    "Porcelain and composite veneers in West End, Brisbane. Custom-made veneers to correct chips, gaps and staining, led by Dr Bikramjit with more than 30 years of experience.",
   url: CANONICAL,
   telephone: "+61738442125",
   image: OG_IMAGE,
@@ -109,7 +110,6 @@ const jsonLd = {
     { "@type": "Place", name: "South Brisbane" },
     { "@type": "Place", name: "Brisbane CBD" },
   ],
-  sameAs: [BIZ.facebook, BIZ.instagram],
   medicalSpecialty: "Dentistry",
   aggregateRating: {
     "@type": "AggregateRating",
@@ -118,10 +118,32 @@ const jsonLd = {
     bestRating: "5",
     worstRating: "1",
   },
-  availableService: SERVICES.map((s) => ({
-    "@type": "MedicalProcedure",
-    name: s.name,
+  availableService: [
+    { "@type": "MedicalProcedure", name: "Porcelain Veneers" },
+    { "@type": "MedicalProcedure", name: "Composite Veneers" },
+    { "@type": "MedicalProcedure", name: "Cosmetic Dentistry" },
+  ],
+  employee: {
+    "@type": "Person",
+    name: "Dr Bikramjit",
+    jobTitle: "Principal Dentist",
+  },
+};
+
+// FAQPage markup for the on-page FAQs — eligible for rich results.
+const faqLd = {
+  "@type": "FAQPage",
+  "@id": `${CANONICAL}#faq`,
+  mainEntity: FAQS.items.map((f) => ({
+    "@type": "Question",
+    name: f.q,
+    acceptedAnswer: { "@type": "Answer", text: f.a },
   })),
+};
+
+const jsonLd = {
+  "@context": "https://schema.org",
+  "@graph": [dentistLd, faqLd],
 };
 
 export default function RootLayout({

@@ -130,6 +130,32 @@ export function Icon({ name, ...p }: { name: string } & SVGProps<SVGSVGElement>)
     tooth: (
       <path d="M12 3c2 0 3-1 5-1 2.2 0 3.5 1.8 3.5 4.5 0 2-.6 3.4-1.2 5.4S18 17 17.3 19c-.5 1.4-1 2-1.8 2s-1.2-.9-1.5-2.4S13.2 15 12 15s-1.2 2.1-1.5 3.6S9.5 21 8.7 21s-1.3-.6-1.8-2c-.7-2-1.4-5.1-2-7.1S3.5 8.5 3.5 6.5C3.5 3.8 4.8 2 7 2c2 0 3 1 5 1z" />
     ),
+    // ---- "Is this you?" qualifiers ----
+    // Chipped / worn: molar with a wedge missing from the crown edge.
+    "tooth-chip": (
+      <>
+        <path d={TOOTH} />
+        <path d="M14.4 2.7 12.6 6.3l3.5.5-2.1 3.1" />
+      </>
+    ),
+    // Stains: molar with discolouration specks on the crown.
+    "tooth-stain": (
+      <>
+        <path d={TOOTH} />
+        <circle cx="9.5" cy="7.6" r="1.15" fill="currentColor" stroke="none" />
+        <circle cx="13.4" cy="6.4" r="0.8" fill="currentColor" stroke="none" />
+        <circle cx="12.4" cy="10.4" r="1" fill="currentColor" stroke="none" />
+      </>
+    ),
+    // Gaps / uneven: three teeth of differing heights, one set wide apart.
+    "tooth-gap": (
+      <>
+        <path d="M3.4 8.4c0-1 .8-1.7 1.9-1.7s1.9.8 1.9 1.7v6.1c0 1.4-.8 2.4-1.9 2.4s-1.9-1-1.9-2.4z" />
+        <path d="M9.2 7.3c0-1 .8-1.8 1.9-1.8s1.9.8 1.9 1.8v7.2c0 1.4-.8 2.4-1.9 2.4s-1.9-1-1.9-2.4z" />
+        <path d="M16.8 9.3c0-1 .8-1.7 1.9-1.7s1.9.8 1.9 1.7v5.2c0 1.4-.8 2.4-1.9 2.4s-1.9-1-1.9-2.4z" />
+        <path d="M14.1 19.6h6.5M14.1 19.6l1.5-1.4M14.1 19.6l1.5 1.4" />
+      </>
+    ),
     pin: (
       <>
         <path d="M12 21s7-6 7-11a7 7 0 1 0-14 0c0 5 7 11 7 11z" />
@@ -149,6 +175,13 @@ export function Icon({ name, ...p }: { name: string } & SVGProps<SVGSVGElement>)
       </>
     ),
     check: <path d="m5 12 5 5 9-11" />,
+    card: (
+      <>
+        <rect x="2.5" y="5.5" width="19" height="13" rx="2.2" />
+        <path d="M2.5 10h19" />
+        <path d="M6 14.5h4" />
+      </>
+    ),
     award: (
       <>
         <circle cx="12" cy="8.6" r="5.6" />
