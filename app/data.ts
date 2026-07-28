@@ -153,7 +153,6 @@ export const FORM = {
   fundingLabel: "How would you like to fund your treatment?",
   fundingOptions: [
     "I have private health insurance",
-    "I'd like to use my superannuation",
     "I'd like a payment plan (Afterpay / Denticare)",
     "I can pay upfront",
     "Not sure yet — I'd like to discuss options",
