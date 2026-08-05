@@ -197,6 +197,13 @@ export function Icon({ name, ...p }: { name: string } & SVGProps<SVGSVGElement>)
       <path d="m12 2 3 6.5 7 .8-5.2 4.8 1.4 7L12 17.8 5.4 21l1.4-7L1.6 9.3l7-.8L12 2z" fill="currentColor" stroke="none" />
     ),
     arrow: <path d="M5 12h14M13 6l6 6-6 6" />,
+    // Grip for the before/after slider handle — drag left or right.
+    wipe: (
+      <>
+        <path d="M9 8 5 12l4 4M15 8l4 4-4 4" strokeWidth={1.9} />
+        <path d="M12 4v16" strokeWidth={1.2} opacity={0.45} />
+      </>
+    ),
     menu: <path d="M4 7h16M4 12h16M4 17h16" />,
     calendar: (
       <>

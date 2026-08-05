@@ -12,6 +12,7 @@ import {
 import { Icon } from "../components/icons";
 import { Header, MobileCTA, ScrollReveal } from "../components/SiteChrome";
 import { VeneersForm } from "../components/VeneersForm";
+import { BeforeAfterSlider } from "../components/BeforeAfterSlider";
 
 export default function VeneersLanding() {
   return (
@@ -43,15 +44,33 @@ export default function VeneersLanding() {
               {HERO.headline}{" "}
               <span className="accent">{HERO.headlineAccent}</span>
             </h1>
-            <p className="hero-sub">{HERO.lede}</p>
-            <div className="trustline">
-              {HERO.trust.map((t) => (
-                <span className="it" key={t.text}>
-                  <Icon name={t.icon} width={19} height={19} />
-                  {t.text}
+            {/* Sits between the headline and the hook line — 16:9, supply at
+                1600 × 900 (see HERO.photo in data.ts). */}
+            <div className="hero-visual">
+              {HERO.photo ? (
+                <Image
+                  src={HERO.photo}
+                  alt={HERO.photoAlt}
+                  fill
+                  sizes="(max-width: 960px) 92vw, 540px"
+                  /* next/image re-encodes at q75 by default, which visibly
+                     softens a photo this size. */
+                  quality={95}
+                  style={{ objectFit: "cover" }}
+                  priority
+                />
+              ) : (
+                <span className="ph">
+                  <Icon name="sparkle" width={26} height={26} />
+                  Image to be added
+                  <em>1600 × 900 · 16:9</em>
                 </span>
-              ))}
+              )}
             </div>
+
+            <p className="hero-hook">{HERO.hook}</p>
+            <p className="hero-sub">{HERO.lede}</p>
+
             <span className="locbadge">
               <Icon name="pin" width={20} height={20} />
               {BIZ.address}
@@ -61,6 +80,20 @@ export default function VeneersLanding() {
           <div className="hero-form-wrap" id="book">
             <VeneersForm />
           </div>
+        </div>
+      </section>
+
+      {/* ---------- Trust strip ---------- */}
+      <section className="trustbar">
+        <div className="container">
+          {HERO.trust.map((t) => (
+            <div className="tb-item" key={t.text}>
+              <span className="tb-ico">
+                <Icon name={t.icon} width={22} height={22} />
+              </span>
+              <span className="tb-text">{t.text}</span>
+            </div>
+          ))}
         </div>
       </section>
 
@@ -78,11 +111,28 @@ export default function VeneersLanding() {
                 key={q.title}
                 style={{ transitionDelay: `${i * 80}ms` }}
               >
-                <div className="qual-ico">
-                  <Icon name={q.icon} width={28} height={28} />
+                <div className="qual-photo">
+                  {q.photo ? (
+                    <Image
+                      src={q.photo}
+                      alt={q.photoAlt}
+                      fill
+                      sizes="(max-width: 640px) 92vw, (max-width: 1000px) 46vw, 372px"
+                      quality={90}
+                      style={{ objectFit: "cover" }}
+                    />
+                  ) : (
+                    /* q.icon is only used for this "awaiting photo" state now */
+                    <span className="ph">
+                      <Icon name={q.icon} width={30} height={30} />
+                      Photo to be added
+                    </span>
+                  )}
                 </div>
-                <h3>{q.title}</h3>
-                <p>{q.body}</p>
+                <div className="qual-body">
+                  <h3>{q.title}</h3>
+                  <p>{q.body}</p>
+                </div>
               </div>
             ))}
           </div>
@@ -99,6 +149,7 @@ export default function VeneersLanding() {
                 alt={`${DOCTOR.capName}, Principal Dentist at ${BIZ.name}, ${BIZ.location}`}
                 fill
                 sizes="(max-width: 960px) 90vw, 420px"
+                quality={90}
                 style={{ objectFit: "cover", objectPosition: "top center" }}
               />
               <div className="doc-photo-cap">
@@ -143,18 +194,21 @@ export default function VeneersLanding() {
             <p>{GALLERY.sub}</p>
           </div>
           <div className="gallery-grid">
-            {GALLERY.items.map((g, i) => (
-              <div
-                className="gcard reveal"
-                key={g.label}
-                style={{ transitionDelay: `${i * 80}ms` }}
-              >
-                <div className="ba-pair">
-                  <BaSlot label="Before" src={g.before} alt={g.label} />
-                  <BaSlot label="After" src={g.after} alt={g.label} />
+            {GALLERY.items.map((g, i) =>
+              g.before && g.after ? (
+                <div
+                  className="gcard reveal"
+                  key={g.label}
+                  style={{ transitionDelay: `${i * 80}ms` }}
+                >
+                  <BeforeAfterSlider
+                    before={g.before}
+                    after={g.after}
+                    label={g.label}
+                  />
                 </div>
-              </div>
-            ))}
+              ) : null
+            )}
           </div>
           <p className="gallery-note">{GALLERY.disclaimer}</p>
           <div className="gallery-cta reveal">
@@ -269,36 +323,5 @@ export default function VeneersLanding() {
 
       <MobileCTA />
     </>
-  );
-}
-
-// Before/after slot: real photo when supplied, styled placeholder until then.
-function BaSlot({
-  label,
-  src,
-  alt,
-}: {
-  label: string;
-  src: string | null;
-  alt: string;
-}) {
-  return (
-    <div className="ba-slot">
-      <span className="lbl">{label}</span>
-      {src ? (
-        <Image
-          src={src}
-          alt={`${alt} — ${label.toLowerCase()} veneers treatment`}
-          fill
-          sizes="(max-width: 640px) 50vw, 200px"
-          style={{ objectFit: "cover" }}
-        />
-      ) : (
-        <span className="ph">
-          <Icon name="sparkle" width={26} height={26} />
-          Photo to be added
-        </span>
-      )}
-    </div>
   );
 }

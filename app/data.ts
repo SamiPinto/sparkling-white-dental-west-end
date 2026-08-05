@@ -16,19 +16,27 @@ export const BIZ = {
 //   fbPixelId  : Meta Pixel ID. Fires PageView + Lead on submit.
 //   gadsSendTo : Google Ads conversion id, e.g. "AW-XXXX/abcd".
 //   formEndpoint: where the lead is POSTed. Empty = console log only.
-// All three are intentionally empty until the client supplies them.
+// The pixel ids stay empty until the client supplies them. The endpoint is
+// our own route — it sends the instant SMS; see app/api/lead/route.ts for the
+// env vars it needs.
 // ---------------------------------------------------------------
 export const TRACKING = {
   fbPixelId: "",
   gadsSendTo: "",
-  formEndpoint: "",
+  formEndpoint: "/api/lead",
 };
 
 export const HERO = {
   eyebrow: "Porcelain Veneers · West End",
   headline: "Love the Smile You See in the",
   headlineAccent: "Mirror",
-  lede: "Chips, gaps, staining — whatever's holding your smile back, custom porcelain veneers can fix it. Real results, gentle care, and a team that explains everything in plain English.",
+  hook: "Do you hide your smile?",
+  lede: "Chips, gaps, staining — whatever's holding your smile back, custom porcelain veneers can fix it. Real results, gentle care, and a team that aims to answer all your questions in your free consultation.",
+  // Hero image — sits between the headline and the hook line.
+  // 16:9; supply replacements at 1600 × 900. Null renders a sized placeholder.
+  photo: "/images/hero-mirror.webp" as string | null,
+  photoAlt:
+    "Woman smiling at her reflection in a bathroom mirror",
   trust: [
     { icon: "award", text: "30+ years experience" },
     { icon: "card", text: "Payment plans available" },
@@ -36,6 +44,9 @@ export const HERO = {
   ],
 };
 
+// Each qualifier now carries a photo of the condition alongside the icon.
+// `photo` stays null until the stock image lands in /public/images; the card
+// falls back to the icon tile so the section never renders broken.
 export const QUALIFY = {
   eyebrow: "Is this you?",
   heading: "Veneers might be right for you if...",
@@ -44,35 +55,58 @@ export const QUALIFY = {
       icon: "tooth-chip",
       title: "Chipped or worn teeth",
       body: "Fix damage from wear, injury, or grinding without invasive treatment.",
+      photo: "/images/qual-chipped.webp",
+      photoAlt: "Close-up of a chipped and worn upper front tooth",
     },
     {
       icon: "tooth-stain",
       title: "Stains that won't budge",
       body: "Discolouration from coffee, wine, or medication that whitening can't fix.",
+      photo: "/images/qual-stains.webp",
+      photoAlt: "Smile showing heavily stained and discoloured teeth",
     },
     {
       icon: "tooth-gap",
       title: "Gaps or uneven teeth",
       body: "Close small gaps and even out your smile without full orthodontics.",
+      photo: "/images/qual-gaps.webp",
+      photoAlt: "Smile showing a gap between the two upper front teeth",
     },
-  ],
+  ] as {
+    icon: string;
+    title: string;
+    body: string;
+    photo: string | null;
+    photoAlt: string;
+  }[],
 };
 
-// Before/after gallery.
-// To publish real photos: drop the files in /public/images and set
-// `before` / `after` to their paths (e.g. "/images/ba-1-before.webp").
-// While either is null the slot renders a styled placeholder instead.
+// Before/after gallery — one entry per patient, rendered as a drag-to-reveal
+// slider (components/BeforeAfterSlider.tsx).
+//
+// To add a patient: crop both shots to 3:4 with the face at the same scale and
+// height, drop them in /public/images, and add an entry. The wipe only reads as
+// one transformation when the pair is framed alike — same camera distance and
+// background — so match the crops carefully. An entry missing either path is
+// skipped, not placeholdered.
 export const GALLERY = {
   eyebrow: "Real Results",
   heading: "Smiles we've transformed",
-  sub: "A sample of the transformations our patients have achieved. More available in consultation.",
+  sub: "Drag the slider on any photo to see the transformation. More available in consultation.",
   ctaLabel: "See What Veneers Could Do For You",
   disclaimer:
-    "Real patient results at Sparkling White Dental West End. Individual results vary. Photos shown with patient consent.",
+    "Real patient results at Sparkling White Dental. Individual results vary. Photos shown with patient consent.",
   items: [
-    { label: "Photo 1", before: null, after: null },
-    { label: "Photo 2", before: null, after: null },
-    { label: "Photo 3", before: null, after: null },
+    {
+      label: "Patient 1",
+      before: "/images/ba-1-before.webp",
+      after: "/images/ba-1-after.webp",
+    },
+    {
+      label: "Patient 2",
+      before: "/images/ba-2-before.webp",
+      after: "/images/ba-2-after.webp",
+    },
   ] as { label: string; before: string | null; after: string | null }[],
 };
 
@@ -97,8 +131,8 @@ export const STEPS = {
 
 export const DOCTOR = {
   heading: "Meet Dr Bikramjit",
-  body: "With more than 30 years of experience, Dr Bikramjit and the team at Sparkling White Dental West End are known for gentle, unhurried care. We listen first, explain everything in plain English, and only ever recommend what you actually need.",
-  photo: "/images/west-end-clinic.webp",
+  body: "With more than 30 years of experience, Dr Bikramjit and the team at Sparkling White Dental West End are known for gentle, unhurried care. We listen first, aim to answer all your questions in your free, person-to-person consultation, and only ever recommend what you actually need.",
+  photo: "/images/dr-bik.webp",
   capName: "Dr Bikramjit",
   capRole: "Principal Dentist · West End clinic",
   statBig: "30+",

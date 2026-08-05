@@ -1,5 +1,5 @@
 /* ============================================================
-   Sparkling White Dental — Goondiwindi VENEERS landing page
+   Sparkling White Dental — VENEERS landing page
    Brand system (colours & fonts matched to the live site):
    Primary  #0082B3  ·  Deep #0170A0  ·  Fonts: Playfair Display + Questrial
    ============================================================ */
@@ -47,8 +47,9 @@
 html {
   scroll-behavior: smooth;
   -webkit-text-size-adjust: 100%;
-  /* Sticky header shouldn't cover the form when jumping to #book */
-  scroll-padding-top: 96px;
+  /* Sticky header shouldn't cover the form when jumping to #book.
+     Keep in sync with .brand-logo img height + .header padding-block. */
+  scroll-padding-top: 122px;
 }
 
 body {
@@ -259,7 +260,7 @@ section {
   padding-block: 14px;
 }
 .brand-logo img {
-  height: 58px;
+  height: 82px;
   width: auto;
 }
 .header-cta {
@@ -334,11 +335,64 @@ section {
   color: var(--brand);
   font-style: italic;
 }
-.hero-sub {
+/* Direct hook line under the headline — deliberately blunt, so it gets
+   display type and brand colour rather than body treatment. */
+.hero-hook {
   margin-top: 22px;
+  font-family: var(--font-display);
+  font-style: italic;
+  font-size: clamp(1.3rem, 2.1vw, 1.65rem);
+  line-height: 1.2;
+  color: var(--brand-deep);
+  display: flex;
+  align-items: baseline;
+  gap: 12px;
+}
+.hero-hook::before {
+  content: "";
+  width: 30px;
+  height: 2px;
+  background: var(--gold);
+  flex: none;
+  transform: translateY(-6px);
+}
+.hero-sub {
+  margin-top: 18px;
   font-size: clamp(1.05rem, 1.4vw, 1.18rem);
   color: var(--ink-soft);
   max-width: 42ch;
+}
+
+/* Hero image, sitting in the copy flow between the headline and the hook line.
+   16:9 — supply the source at 1600 × 900. */
+.hero-visual {
+  position: relative;
+  margin-top: 26px;
+  aspect-ratio: 16 / 9;
+  border-radius: 20px;
+  overflow: hidden;
+  background: linear-gradient(150deg, var(--brand-wash), var(--brand-tint-2));
+  box-shadow: var(--shadow-md);
+  display: grid;
+  place-items: center;
+}
+.hero-visual .ph {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 0 16px;
+  font-size: 0.82rem;
+  line-height: 1.4;
+  color: var(--brand-deep);
+  opacity: 0.6;
+}
+.hero-visual .ph em {
+  font-style: normal;
+  font-size: 0.72rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  opacity: 0.75;
 }
 
 /* Address badge — gold rule, carried over from the content brief */
@@ -361,23 +415,50 @@ section {
   flex: none;
 }
 
-/* Hero trust line — three proof points under the lede */
-.trustline {
-  margin-top: 26px;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 12px 26px;
+/* ---------- Trust strip — its own band under the hero ---------- */
+.trustbar {
+  background: linear-gradient(180deg, var(--paper-2) 0%, #fff 100%);
+  border-top: 1px solid var(--line);
+  border-bottom: 1px solid var(--line);
+  padding-block: clamp(18px, 2.4vw, 30px);
 }
-.trustline .it {
-  display: inline-flex;
+.trustbar .container {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(14px, 2.5vw, 36px);
   align-items: center;
-  gap: 9px;
-  font-size: 0.94rem;
-  color: var(--brand-darker);
 }
-.trustline .it svg {
-  color: var(--brand);
+.tb-item {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 14px;
+}
+/* Hairline between items rather than around them */
+.tb-item + .tb-item {
+  border-left: 1px solid var(--line);
+  padding-left: clamp(14px, 2.5vw, 36px);
+  margin-left: calc(-1 * clamp(14px, 2.5vw, 36px) / 2);
+}
+.tb-ico {
+  width: 46px;
+  height: 46px;
   flex: none;
+  border-radius: 14px;
+  background: var(--brand-tint);
+  color: var(--brand-deep);
+  display: grid;
+  place-items: center;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+.tb-item:hover .tb-ico {
+  background: var(--brand);
+  color: #fff;
+}
+.tb-text {
+  font-size: 1.02rem;
+  color: var(--ink);
+  line-height: 1.35;
 }
 
 .hero-ctas {
@@ -623,7 +704,6 @@ section {
   background: #fff;
   border: 1px solid var(--line);
   border-radius: var(--r-md);
-  padding: 30px 28px;
   box-shadow: var(--shadow-sm);
   transition: transform 0.3s cubic-bezier(0.2, 0.8, 0.2, 1),
     box-shadow 0.3s ease, border-color 0.3s ease;
@@ -638,6 +718,7 @@ section {
   height: 3px;
   width: 0;
   background: var(--brand);
+  z-index: 3;
   transition: width 0.35s cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 .qual:hover {
@@ -648,21 +729,37 @@ section {
 .qual:hover::before {
   width: 100%;
 }
-.qual-ico {
-  width: 54px;
-  height: 54px;
-  border-radius: 15px;
-  background: var(--brand-tint);
-  color: var(--brand-deep);
+/* Photo of the condition — the icon stays as a badge on top of it so the
+   card still reads if a photo is missing. */
+/* 3:2 — what dental stock is natively shot at, so the condition photos drop in
+   without a crop that cuts into an already-tight mouth close-up. */
+.qual-photo {
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: linear-gradient(135deg, var(--brand-wash), var(--brand-tint-2));
   display: grid;
   place-items: center;
-  margin-bottom: 20px;
-  transition: background 0.3s ease, color 0.3s ease, transform 0.3s ease;
 }
-.qual:hover .qual-ico {
-  background: var(--brand);
-  color: #fff;
-  transform: rotate(-6deg);
+.qual-photo img {
+  transition: transform 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+.qual:hover .qual-photo img {
+  transform: scale(1.05);
+}
+.qual-photo .ph {
+  display: grid;
+  place-items: center;
+  gap: 8px;
+  text-align: center;
+  padding: 0 12px;
+  font-size: 0.74rem;
+  line-height: 1.4;
+  color: var(--brand-deep);
+  opacity: 0.5;
+}
+.qual-body {
+  padding: 26px 28px 30px;
 }
 .qual h3 {
   font-size: 1.24rem;
@@ -675,11 +772,15 @@ section {
 }
 
 /* ---------- Before / after gallery ---------- */
+/* Two per row, not three — each card already holds two portrait photos, so a
+   third column would shrink every face past the point of being readable. */
 .gallery-grid {
   margin-top: 48px;
   display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 20px;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 24px;
+  max-width: 980px;
+  margin-inline: auto;
 }
 .gcard {
   border-radius: var(--r-md);
@@ -694,44 +795,107 @@ section {
   transform: translateY(-5px);
   box-shadow: var(--shadow-md);
 }
-.ba-pair {
-  display: grid;
-  grid-template-columns: 1fr 1fr;
-  gap: 2px;
-  background: #fff;
-}
-.ba-slot {
+/* ---------- Before / after slider ----------
+   Portrait 3:4 because the shots are face + smile, not mouth-only close-ups.
+   Both photos are stacked full-bleed and the before layer is clipped from the
+   right, so the wipe only lines up as far as the two shots were framed alike. */
+.ba {
   position: relative;
-  aspect-ratio: 1 / 1;
-  background: linear-gradient(135deg, var(--brand-wash), var(--brand-tint-2));
-  display: grid;
-  place-items: center;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
+  background: linear-gradient(135deg, var(--brand-wash), var(--brand-tint-2));
+  touch-action: pan-y;
+  -webkit-user-select: none;
+  user-select: none;
 }
-.ba-slot .lbl {
+.ba-layer {
   position: absolute;
-  top: 10px;
-  left: 10px;
-  z-index: 2;
-  background: rgba(1, 58, 83, 0.85);
+  inset: 0;
+}
+.ba-before {
+  z-index: 1;
+}
+.ba-lbl {
+  position: absolute;
+  top: 12px;
+  z-index: 3;
+  background: rgba(1, 58, 83, 0.82);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
   color: #fff;
   font-size: 0.62rem;
   letter-spacing: 0.12em;
   text-transform: uppercase;
   padding: 5px 10px;
   border-radius: 6px;
+  pointer-events: none;
+  transition: opacity 0.25s ease;
 }
-.ba-slot .ph {
-  text-align: center;
+.ba-lbl--before {
+  left: 12px;
+}
+.ba-lbl--after {
+  right: 12px;
+  background: rgba(0, 130, 179, 0.92);
+}
+.ba-handle {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  z-index: 4;
+  width: 3px;
+  margin-left: -1.5px;
+  background: #fff;
+  box-shadow: 0 0 0 1px rgba(1, 58, 83, 0.18), 0 2px 14px rgba(1, 58, 83, 0.35);
+  pointer-events: none;
+}
+.ba-grip {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  width: 46px;
+  height: 46px;
+  border-radius: 50%;
+  background: #fff;
   color: var(--brand-deep);
-  opacity: 0.5;
   display: grid;
   place-items: center;
-  gap: 8px;
-  padding: 0 12px;
-  font-size: 0.74rem;
-  line-height: 1.4;
+  box-shadow: 0 6px 18px rgba(1, 58, 83, 0.32);
 }
+/* The real control — transparent and full-bleed so a drag anywhere on the
+   photo moves the wipe. It also carries keyboard arrows for free. */
+.ba-range {
+  position: absolute;
+  inset: 0;
+  z-index: 5;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  opacity: 0;
+  cursor: ew-resize;
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+}
+.ba-range::-webkit-slider-thumb {
+  -webkit-appearance: none;
+  width: 56px;
+  height: 100%;
+  cursor: ew-resize;
+}
+.ba-range::-moz-range-thumb {
+  width: 56px;
+  height: 100%;
+  border: 0;
+  cursor: ew-resize;
+}
+/* The input itself is invisible, so the focus ring goes on the card instead */
+.ba:has(.ba-range:focus-visible) {
+  outline: 3px solid var(--brand);
+  outline-offset: -3px;
+}
+
 .gallery-note {
   margin-top: 26px;
   text-align: center;
@@ -1106,6 +1270,9 @@ section {
 .hero-anim > *:nth-child(5) {
   animation-delay: 0.37s;
 }
+.hero-anim > *:nth-child(6) {
+  animation-delay: 0.45s;
+}
 .hero-form-wrap {
   animation: floatUp 0.9s cubic-bezier(0.2, 0.8, 0.2, 1) 0.22s both;
 }
@@ -1143,9 +1310,17 @@ section {
 
 @media (max-width: 1000px) {
   .qual-grid,
-  .step-grid,
-  .gallery-grid {
+  .step-grid {
     grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+/* Two pair-cards side by side stop being legible before the other grids do —
+   each column holds two photos, so it needs its own, earlier breakpoint. */
+@media (max-width: 880px) {
+  .gallery-grid {
+    grid-template-columns: 1fr;
+    max-width: 460px;
   }
 }
 
@@ -1177,7 +1352,7 @@ section {
     font-size: 16px;
   }
   html {
-    scroll-padding-top: 80px;
+    scroll-padding-top: 96px;
   }
   .mobile-cta {
     display: flex;
@@ -1188,7 +1363,30 @@ section {
     display: none;
   }
   .brand-logo img {
-    height: 46px;
+    height: 62px;
+  }
+  .trustbar .container {
+    grid-template-columns: 1fr;
+    gap: 14px;
+    justify-items: start;
+  }
+  /* Vertical hairlines don't read once the items stack */
+  .tb-item + .tb-item {
+    border-left: 0;
+    padding-left: 0;
+    margin-left: 0;
+  }
+  .tb-ico {
+    width: 40px;
+    height: 40px;
+    border-radius: 12px;
+  }
+  .tb-text {
+    font-size: 0.98rem;
+  }
+  .ba-grip {
+    width: 40px;
+    height: 40px;
   }
   .announce .container {
     gap: 12px;
@@ -1210,13 +1408,8 @@ section {
     align-items: flex-start;
   }
   .qual-grid,
-  .step-grid,
-  .gallery-grid {
+  .step-grid {
     grid-template-columns: 1fr;
-  }
-  .gallery-grid {
-    max-width: 420px;
-    margin-inline: auto;
   }
   .frow {
     grid-template-columns: 1fr;
