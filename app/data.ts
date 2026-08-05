@@ -107,6 +107,11 @@ export const GALLERY = {
       before: "/images/ba-2-before.webp",
       after: "/images/ba-2-after.webp",
     },
+    {
+      label: "Patient 3",
+      before: "/images/ba-3-before.webp",
+      after: "/images/ba-3-after.webp",
+    },
   ] as { label: string; before: string | null; after: string | null }[],
 };
 

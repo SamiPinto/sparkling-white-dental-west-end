@@ -98,7 +98,7 @@ export function BeforeAfterSlider({
           src={after}
           alt={afterAlt ?? `${label} — after porcelain veneers`}
           fill
-          sizes="(max-width: 880px) 92vw, 478px"
+          sizes="(max-width: 700px) 92vw, (max-width: 1040px) 44vw, 343px"
           quality={92}
           style={{ objectFit: "cover" }}
         />
@@ -112,7 +112,7 @@ export function BeforeAfterSlider({
           src={before}
           alt={beforeAlt ?? `${label} — before porcelain veneers`}
           fill
-          sizes="(max-width: 880px) 92vw, 478px"
+          sizes="(max-width: 700px) 92vw, (max-width: 1040px) 44vw, 343px"
           quality={92}
           style={{ objectFit: "cover" }}
         />

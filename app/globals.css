@@ -774,13 +774,12 @@ section {
 /* ---------- Before / after gallery ---------- */
 /* Two per row, not three — each card already holds two portrait photos, so a
    third column would shrink every face past the point of being readable. */
+/* Three across — one row per set of pairs. */
 .gallery-grid {
   margin-top: 48px;
   display: grid;
-  grid-template-columns: repeat(2, 1fr);
-  gap: 24px;
-  max-width: 980px;
-  margin-inline: auto;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 22px;
 }
 .gcard {
   border-radius: var(--r-md);
@@ -1317,10 +1316,24 @@ section {
 
 /* Two pair-cards side by side stop being legible before the other grids do —
    each column holds two photos, so it needs its own, earlier breakpoint. */
-@media (max-width: 880px) {
+@media (max-width: 1040px) {
+  .gallery-grid {
+    grid-template-columns: repeat(2, 1fr);
+    max-width: 860px;
+    margin-inline: auto;
+  }
+  /* Only at two columns can an odd last card sit alone against the edge. */
+  .gallery-grid > .gcard:last-child:nth-child(odd) {
+    grid-column: 1 / -1;
+    justify-self: center;
+    width: min(100%, 420px);
+  }
+}
+
+@media (max-width: 700px) {
   .gallery-grid {
     grid-template-columns: 1fr;
-    max-width: 460px;
+    max-width: 440px;
   }
 }
 

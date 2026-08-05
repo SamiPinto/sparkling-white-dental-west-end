@@ -1,20 +1,31 @@
 import { NextResponse } from "next/server";
+import nodemailer from "nodemailer";
 import { BIZ } from "../../data";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 // ---------------------------------------------------------------
-// Lead endpoint — fires an instant SMS to the clinic on submit.
+// Lead endpoint — emails the lead, appends it to a Google Sheet, and fires an
+// SMS on submit.
+//
+// All three channels are attempted independently: one failing never stops the
+// others, and none failing ever fails the submission, because the patient
+// should not see an error for a delivery problem at our end. Whatever
+// happens, the full lead is logged so it can be recovered from the platform
+// logs.
 //
 // Required env (set in Vercel, never committed — .env*.local is gitignored):
-//   SMS_PROVIDER        "clicksend" | "twilio"
-//   LEAD_SMS_TO         comma-separated E.164 numbers, e.g. "+61412345678"
-//   clicksend:          CLICKSEND_USERNAME, CLICKSEND_API_KEY
-//   twilio:             TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM
+//   email:  SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, LEAD_EMAIL_TO
+//           LEAD_EMAIL_FROM is optional and defaults to SMTP_USER.
+//   sheet:  SHEETS_WEBHOOK_URL  the Apps Script web app /exec URL
+//           SHEETS_TOKEN        shared secret the script checks
+//   sms:    SMS_PROVIDER  "clicksend" | "twilio"
+//           LEAD_SMS_TO   comma-separated E.164, e.g. "+61412345678"
+//           clicksend:    CLICKSEND_USERNAME, CLICKSEND_API_KEY
+//           twilio:       TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM
 //
-// With no provider configured the lead is logged and the caller still gets a
-// 200 — so the form works in preview without credentials.
+// Any channel can be left unconfigured; it is simply skipped.
 // ---------------------------------------------------------------
 
 type Lead = Record<string, unknown>;
@@ -55,6 +66,124 @@ function buildMessage(lead: Lead) {
   ]
     .filter(Boolean)
     .join("\n");
+}
+
+// Every field the form collects, in the order it is useful to read them.
+const EMAIL_ROWS: [string, string][] = [
+  ["Name", "name"],
+  ["Phone", "phone"],
+  ["Email", "email"],
+  ["Preferred date", "apptDate"],
+  ["Preferred time", "apptTime"],
+  ["Employment", "employment"],
+  ["Funding", "funding"],
+  ["Source", "utm_source"],
+  ["Medium", "utm_medium"],
+  ["Campaign", "utm_campaign"],
+  ["Content", "utm_content"],
+  ["Term", "utm_term"],
+  ["Google click id", "gclid"],
+  ["Meta click id", "fbclid"],
+  ["Landing page", "landing_url"],
+  ["Submitted", "submitted_at"],
+];
+
+function esc(s: string) {
+  return s
+    .replace(/&/g, "&amp;")
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
+    .replace(/"/g, "&quot;");
+}
+
+async function sendEmail(lead: Lead) {
+  const host = process.env.SMTP_HOST;
+  const user = process.env.SMTP_USER;
+  const pass = process.env.SMTP_PASS;
+  const to = (process.env.LEAD_EMAIL_TO ?? "")
+    .split(",")
+    .map((a) => a.trim())
+    .filter(Boolean);
+
+  if (!host || !user || !pass || to.length === 0) return false;
+
+  const port = Number(process.env.SMTP_PORT ?? 587);
+  const transporter = nodemailer.createTransport({
+    host,
+    port,
+    // 465 is implicit TLS; 587 upgrades via STARTTLS.
+    secure: port === 465,
+    auth: { user, pass },
+  });
+
+  const rows = EMAIL_ROWS.map(([label, key]) => [label, str(lead[key], 400)])
+    .filter(([, v]) => v)
+    .map(([label, v]) => [label, v] as [string, string]);
+
+  const text = rows.map(([l, v]) => `${l}: ${v}`).join("\n");
+  const html = `<div style="font-family:system-ui,Segoe UI,Arial,sans-serif;font-size:15px;color:#10323d">
+<h2 style="margin:0 0 4px;font-size:19px">New veneers enquiry — ${esc(
+    BIZ.location
+  )}</h2>
+<p style="margin:0 0 16px;color:#607680">${esc(BIZ.name)} · ${esc(
+    BIZ.address
+  )}</p>
+<table cellpadding="0" cellspacing="0" style="border-collapse:collapse">
+${rows
+  .map(
+    ([l, v]) =>
+      `<tr><td style="padding:5px 18px 5px 0;color:#607680;vertical-align:top;white-space:nowrap">${esc(
+        l
+      )}</td><td style="padding:5px 0"><strong>${esc(v)}</strong></td></tr>`
+  )
+  .join("\n")}
+</table>
+<p style="margin:20px 0 0;color:#607680;font-size:13px">Sent automatically by the ${esc(
+    BIZ.location
+  )} veneers landing page.</p>
+</div>`;
+
+  await transporter.sendMail({
+    from: process.env.LEAD_EMAIL_FROM || user,
+    to,
+    // Reply goes to the patient, so the team can answer straight from the alert.
+    replyTo: str(lead.email) || undefined,
+    subject: `New Veneers Lead — ${BIZ.location} — ${
+      str(lead.name) || "Website enquiry"
+    }`,
+    text,
+    html,
+  });
+  return true;
+}
+
+// Appends the lead to the shared Google Sheet via an Apps Script web app.
+// The script picks the tab from `location`, so all three sites post to the
+// same URL and land in their own tab.
+async function sendToSheet(lead: Lead) {
+  const url = process.env.SHEETS_WEBHOOK_URL;
+  if (!url) return false;
+
+  const payload: Record<string, string> = {
+    token: process.env.SHEETS_TOKEN ?? "",
+    location: BIZ.location,
+  };
+  EMAIL_ROWS.forEach(([, key]) => {
+    payload[key] = str(lead[key], 400);
+  });
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify(payload),
+    // Apps Script answers with a 302 to script.googleusercontent.com.
+    redirect: "follow",
+  });
+  const body = await res.text();
+  if (!res.ok || !body.includes('"ok":true')) {
+    throw new Error(`Sheets ${res.status}: ${body.slice(0, 200)}`);
+  }
+  return true;
 }
 
 async function sendClickSend(to: string[], body: string) {
@@ -135,31 +264,55 @@ export async function POST(req: Request) {
     return NextResponse.json({ ok: false }, { status: 429 });
   }
 
-  const to = (process.env.LEAD_SMS_TO ?? "")
+  // Logged before anything is dispatched, so the lead is recoverable from the
+  // platform logs even if every delivery channel fails.
+  console.log("LEAD", JSON.stringify(lead));
+
+  const smsTo = (process.env.LEAD_SMS_TO ?? "")
     .split(",")
     .map((n) => n.trim())
     .filter(Boolean);
   const provider = (process.env.SMS_PROVIDER ?? "").toLowerCase();
-  const message = buildMessage(lead);
 
-  // The lead is logged either way, so a failed SMS is still recoverable from
-  // the platform logs rather than lost outright.
-  console.log("LEAD", JSON.stringify(lead));
-
-  if (!provider || to.length === 0) {
-    console.warn("LEAD: no SMS provider configured — notification skipped");
-    return NextResponse.json({ ok: true, notified: false });
-  }
-
-  try {
-    if (provider === "clicksend") await sendClickSend(to, message);
-    else if (provider === "twilio") await sendTwilio(to, message);
+  async function trySms() {
+    if (!provider || smsTo.length === 0) {
+      console.warn("LEAD: no SMS provider configured — skipped");
+      return false;
+    }
+    const message = buildMessage(lead);
+    if (provider === "clicksend") await sendClickSend(smsTo, message);
+    else if (provider === "twilio") await sendTwilio(smsTo, message);
     else throw new Error(`Unknown SMS_PROVIDER "${provider}"`);
-  } catch (err) {
-    console.error("LEAD: SMS notification failed", err);
-    // The patient still gets the success screen — their details are captured.
-    return NextResponse.json({ ok: true, notified: false });
+    return true;
   }
 
-  return NextResponse.json({ ok: true, notified: true });
+  // Independent channels — one failing must not stop the others, so they are
+  // settled rather than awaited in sequence.
+  const [emailResult, sheetResult, smsResult] = await Promise.allSettled([
+    sendEmail(lead),
+    sendToSheet(lead),
+    trySms(),
+  ]);
+
+  const emailed = emailResult.status === "fulfilled" && emailResult.value;
+  const saved = sheetResult.status === "fulfilled" && sheetResult.value;
+  const texted = smsResult.status === "fulfilled" && smsResult.value;
+
+  if (emailResult.status === "rejected") {
+    console.error("LEAD: email failed", emailResult.reason);
+  } else if (!emailResult.value) {
+    console.warn("LEAD: no SMTP configured — email skipped");
+  }
+  if (sheetResult.status === "rejected") {
+    console.error("LEAD: sheet append failed", sheetResult.reason);
+  } else if (!sheetResult.value) {
+    console.warn("LEAD: no SHEETS_WEBHOOK_URL — sheet skipped");
+  }
+  if (smsResult.status === "rejected") {
+    console.error("LEAD: SMS failed", smsResult.reason);
+  }
+
+  // The patient always sees success — their details are captured, and a
+  // delivery problem at our end is not theirs to see or retry.
+  return NextResponse.json({ ok: true, emailed, saved, texted });
 }
