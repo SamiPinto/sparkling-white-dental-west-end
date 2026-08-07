@@ -170,7 +170,10 @@ export default function VeneersLanding() {
 
           <div className="doc-body reveal">
             <span className="eyebrow">Your dentist</span>
-            <h2>{DOCTOR.heading}</h2>
+            <h2>
+              {DOCTOR.heading}
+              <span className="doc-name-alt">{DOCTOR.headingAlt}</span>
+            </h2>
             <p>{DOCTOR.body}</p>
             <div className="doc-actions">
               <a href="#book" className="btn btn--lg">

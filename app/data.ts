@@ -136,9 +136,10 @@ export const STEPS = {
 
 export const DOCTOR = {
   heading: "Meet Dr Bikramjit",
-  body: "With more than 30 years of experience, Dr Bikramjit and the team at Sparkling White Dental West End are known for gentle, unhurried care. We listen first, aim to answer all your questions in your free, person-to-person consultation, and only ever recommend what you actually need.",
+  headingAlt: "(Dr Bik Sandhu)",
+  body: "With more than 30 years of experience, Dr Bikramjit (Dr Bik Sandhu) and the team at Sparkling White Dental West End are known for gentle, unhurried care. We listen first, aim to answer all your questions in your free, person-to-person consultation, and only ever recommend what you actually need.",
   photo: "/images/dr-bik.webp",
-  capName: "Dr Bikramjit",
+  capName: "Dr Bikramjit (Dr Bik Sandhu)",
   capRole: "Principal Dentist · West End clinic",
   statBig: "30+",
   statSmall: "Years of experience",

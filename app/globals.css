@@ -1051,7 +1051,7 @@ section {
 .doc-photo-cap .cap-name {
   font-family: var(--font-display);
   font-size: 1.6rem;
-  line-height: 1;
+  line-height: 1.12;
 }
 .doc-photo-cap .cap-role {
   margin-top: 6px;
@@ -1093,6 +1093,12 @@ section {
 .doc-body h2 {
   font-size: clamp(2rem, 3.6vw, 2.9rem);
   margin-top: 18px;
+}
+.doc-body h2 .doc-name-alt {
+  display: block;
+  margin-top: 6px;
+  font-size: 0.58em;
+  color: var(--ink-soft);
 }
 .doc-body p {
   margin-top: 20px;
