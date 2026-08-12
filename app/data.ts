@@ -1,9 +1,14 @@
 // Central data for the West End VENEERS landing page (content brief v2).
 // Copy is taken verbatim from the client-supplied brief.
 
+// `location` is the machine-facing name — it keys the Google Sheet tab and the
+// lead email subject, so it stays bare. `locationDisplay` is what the page
+// shows; it disambiguates the suburb for people outside Brisbane.
 export const BIZ = {
   name: "Sparkling White Dental",
   location: "West End",
+  locationDisplay: "West End (Brisbane)",
+  postcode: "4101",
   city: "Brisbane",
   phone: "(07) 3844 2125",
   phoneHref: "tel:+61738442125",
@@ -27,7 +32,7 @@ export const TRACKING = {
 };
 
 export const HERO = {
-  eyebrow: "Porcelain Veneers · West End",
+  eyebrow: "Porcelain Veneers · West End (Brisbane)",
   headline: "Love the Smile You See in the",
   headlineAccent: "Mirror",
   hook: "Do you hide your smile?",
@@ -140,7 +145,7 @@ export const DOCTOR = {
   body: "With more than 30 years of experience, Dr Bikramjit (Dr Bik Sandhu) and the team at Sparkling White Dental West End are known for gentle, unhurried care. We listen first, aim to answer all your questions in your free, person-to-person consultation, and only ever recommend what you actually need.",
   photo: "/images/dr-bik.webp",
   capName: "Dr Bikramjit (Dr Bik Sandhu)",
-  capRole: "Principal Dentist · West End clinic",
+  capRole: "Principal Dentist · West End (Brisbane) clinic",
   statBig: "30+",
   statSmall: "Years of experience",
 };

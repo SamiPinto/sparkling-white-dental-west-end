@@ -24,7 +24,7 @@ export default function VeneersLanding() {
       <div className="announce">
         <div className="container">
           <span>
-            <strong>Porcelain veneers</strong> in {BIZ.location}
+            <strong>Porcelain veneers</strong> in {BIZ.locationDisplay}
           </span>
           <span className="dot">•</span>
           <span className="a-2">
@@ -304,7 +304,7 @@ export default function VeneersLanding() {
       <footer className="footer">
         <div className="container">
           <span className="f-name">
-            {BIZ.name} — {BIZ.location}
+            {BIZ.name} — {BIZ.locationDisplay}
           </span>
           <span className="f-sep">|</span>
           <a href={BIZ.phoneHref}>{BIZ.phone}</a>

@@ -10,6 +10,8 @@ type Fields = {
   name: string;
   email: string;
   phone: string;
+  suburb: string;
+  postcode: string;
   apptDate: string;
   apptTime: string;
 };
@@ -22,6 +24,8 @@ const EMPTY: Fields = {
   name: "",
   email: "",
   phone: "",
+  suburb: "",
+  postcode: "",
   apptDate: "",
   apptTime: "",
 };
@@ -80,6 +84,8 @@ export function VeneersForm() {
   const nameRef = useRef<HTMLInputElement>(null);
   const emailRef = useRef<HTMLInputElement>(null);
   const phoneRef = useRef<HTMLInputElement>(null);
+  const suburbRef = useRef<HTMLInputElement>(null);
+  const postcodeRef = useRef<HTMLInputElement>(null);
   const honeypot = useRef<HTMLInputElement>(null);
   const advanced = useRef(false);
 
@@ -135,15 +141,22 @@ export function VeneersForm() {
       next.email = "Please enter a valid email address.";
     if (values.phone.replace(/\D/g, "").length < 8)
       next.phone = "Please enter a contact number we can reach you on.";
+    if (!values.suburb.trim()) next.suburb = "Please enter your suburb.";
+    if (!/^\d{4}$/.test(values.postcode.trim()))
+      next.postcode = "Please enter a 4-digit postcode.";
     setErrors(next);
     if (next.name) return nameRef.current?.focus();
     if (next.email) return emailRef.current?.focus();
     if (next.phone) return phoneRef.current?.focus();
+    if (next.suburb) return suburbRef.current?.focus();
+    if (next.postcode) return postcodeRef.current?.focus();
 
     const payload = {
       name: values.name.trim(),
       email: values.email.trim(),
       phone: values.phone.trim(),
+      suburb: values.suburb.trim(),
+      postcode: values.postcode.trim(),
       employment: values.employment,
       funding: values.funding,
       apptDate: values.apptDate,
@@ -354,6 +367,56 @@ export function VeneersForm() {
               {errors.phone && (
                 <span className="field-error" id="err-phone">
                   {errors.phone}
+                </span>
+              )}
+            </div>
+          </div>
+
+          <div className="frow">
+            <div className="field">
+              <label htmlFor="suburb">
+                Suburb <span className="req">*</span>
+              </label>
+              <input
+                type="text"
+                id="suburb"
+                name="suburb"
+                autoComplete="address-level2"
+                placeholder={BIZ.location}
+                ref={suburbRef}
+                value={values.suburb}
+                onChange={set("suburb")}
+                aria-invalid={!!errors.suburb}
+                aria-describedby={errors.suburb ? "err-suburb" : undefined}
+              />
+              {errors.suburb && (
+                <span className="field-error" id="err-suburb">
+                  {errors.suburb}
+                </span>
+              )}
+            </div>
+
+            <div className="field">
+              <label htmlFor="postcode">
+                Postcode <span className="req">*</span>
+              </label>
+              <input
+                type="text"
+                id="postcode"
+                name="postcode"
+                autoComplete="postal-code"
+                inputMode="numeric"
+                maxLength={4}
+                placeholder={BIZ.postcode}
+                ref={postcodeRef}
+                value={values.postcode}
+                onChange={set("postcode")}
+                aria-invalid={!!errors.postcode}
+                aria-describedby={errors.postcode ? "err-postcode" : undefined}
+              />
+              {errors.postcode && (
+                <span className="field-error" id="err-postcode">
+                  {errors.postcode}
                 </span>
               )}
             </div>
