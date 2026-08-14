@@ -21,12 +21,12 @@ export const BIZ = {
 //   fbPixelId  : Meta Pixel ID. Fires PageView + Lead on submit.
 //   gadsSendTo : Google Ads conversion id, e.g. "AW-XXXX/abcd".
 //   formEndpoint: where the lead is POSTed. Empty = console log only.
-// The pixel ids stay empty until the client supplies them. The endpoint is
+// gadsSendTo stays empty until the client supplies it. The endpoint is
 // our own route — it sends the instant SMS; see app/api/lead/route.ts for the
 // env vars it needs.
 // ---------------------------------------------------------------
 export const TRACKING = {
-  fbPixelId: "",
+  fbPixelId: "425647446643014",
   gadsSendTo: "",
   formEndpoint: "/api/lead",
 };

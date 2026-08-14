@@ -1,6 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import { Playfair_Display, Questrial } from "next/font/google";
-import { BIZ, FAQS } from "./data";
+import { BIZ, FAQS, TRACKING } from "./data";
 import "./globals.css";
 
 const playfair = Playfair_Display({
@@ -159,6 +159,20 @@ export default function RootLayout({
           <style>{`.reveal{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
         {children}
+        {/* Meta Pixel fallback for visitors with JS disabled — the pixel
+            itself is bootstrapped in VeneersForm. */}
+        {TRACKING.fbPixelId && (
+          <noscript>
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              height="1"
+              width="1"
+              style={{ display: "none" }}
+              alt=""
+              src={`https://www.facebook.com/tr?id=${TRACKING.fbPixelId}&ev=PageView&noscript=1`}
+            />
+          </noscript>
+        )}
         <script
           type="application/ld+json"
           dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
