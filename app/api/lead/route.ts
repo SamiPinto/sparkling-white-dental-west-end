@@ -20,10 +20,11 @@ export const dynamic = "force-dynamic";
 //           LEAD_EMAIL_FROM is optional and defaults to SMTP_USER.
 //   sheet:  SHEETS_WEBHOOK_URL  the Apps Script web app /exec URL
 //           SHEETS_TOKEN        shared secret the script checks
-//   sms:    SMS_PROVIDER  "clicksend" | "twilio"
+//   sms:    SMS_PROVIDER  "ghl" | "clicksend" | "twilio"
 //           LEAD_SMS_TO   comma-separated E.164, e.g. "+61412345678"
 //           clicksend:    CLICKSEND_USERNAME, CLICKSEND_API_KEY
 //           twilio:       TWILIO_ACCOUNT_SID, TWILIO_AUTH_TOKEN, TWILIO_FROM
+//           ghl:          GHL_WEBHOOK_URL (recipient set in the workflow)
 //
 // Any channel can be left unconfigured; it is simply skipped.
 // ---------------------------------------------------------------
@@ -58,7 +59,7 @@ function buildMessage(lead: Lead) {
     .filter(Boolean)
     .join(" ");
   return [
-    `New veneers lead — ${BIZ.location}`,
+    `New veneers lead - ${BIZ.location}`,
     `Name: ${str(lead.name)}`,
     `Phone: ${str(lead.phone)}`,
     `Email: ${str(lead.email)}`,
@@ -212,6 +213,28 @@ async function sendClickSend(to: string[], body: string) {
   }
 }
 
+// The recipient lives in the GHL workflow's Internal Notification action, so
+// LEAD_SMS_TO does nothing here — changing it will not change who gets texted.
+async function sendGhl(body: string, lead: Lead) {
+  const url = process.env.GHL_WEBHOOK_URL;
+  if (!url) throw new Error("GHL webhook URL missing");
+
+  const res = await fetch(url, {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({
+      message: body,
+      location: BIZ.location,
+      name: str(lead.name),
+      phone: str(lead.phone),
+      email: str(lead.email),
+    }),
+  });
+  if (!res.ok) {
+    throw new Error(`GHL ${res.status}: ${await res.text()}`);
+  }
+}
+
 async function sendTwilio(to: string[], body: string) {
   const sid = process.env.TWILIO_ACCOUNT_SID;
   const token = process.env.TWILIO_AUTH_TOKEN;
@@ -281,11 +304,19 @@ export async function POST(req: Request) {
   const provider = (process.env.SMS_PROVIDER ?? "").toLowerCase();
 
   async function trySms() {
-    if (!provider || smsTo.length === 0) {
+    if (!provider) {
       console.warn("LEAD: no SMS provider configured — skipped");
       return false;
     }
     const message = buildMessage(lead);
+    if (provider === "ghl") {
+      await sendGhl(message, lead);
+      return true;
+    }
+    if (smsTo.length === 0) {
+      console.warn("LEAD: no SMS recipient configured — skipped");
+      return false;
+    }
     if (provider === "clicksend") await sendClickSend(smsTo, message);
     else if (provider === "twilio") await sendTwilio(smsTo, message);
     else throw new Error(`Unknown SMS_PROVIDER "${provider}"`);
