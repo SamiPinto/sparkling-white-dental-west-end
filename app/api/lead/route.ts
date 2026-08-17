@@ -67,7 +67,6 @@ function buildMessage(lead: Lead) {
     when ? `Prefers: ${when}` : "",
     str(lead.funding) ? `Funding: ${str(lead.funding)}` : "",
     str(lead.employment) ? `Employment: ${str(lead.employment)}` : "",
-    str(lead.utm_source) ? `Source: ${str(lead.utm_source)}` : "",
   ]
     .filter(Boolean)
     .join("\n");
