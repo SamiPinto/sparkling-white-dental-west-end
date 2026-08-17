@@ -1,4 +1,5 @@
 import type { Metadata, Viewport } from "next";
+import Script from "next/script";
 import { Playfair_Display, Questrial } from "next/font/google";
 import { BIZ, FAQS, TRACKING } from "./data";
 import "./globals.css";
@@ -172,6 +173,20 @@ export default function RootLayout({
               src={`https://www.facebook.com/tr?id=${TRACKING.fbPixelId}&ev=PageView&noscript=1`}
             />
           </noscript>
+        )}
+        {TRACKING.gadsId && (
+          <>
+            <Script
+              src={`https://www.googletagmanager.com/gtag/js?id=${TRACKING.gadsId}`}
+              strategy="afterInteractive"
+            />
+            <Script id="gtag-init" strategy="afterInteractive">
+              {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', '${TRACKING.gadsId}');`}
+            </Script>
+          </>
         )}
         <script
           type="application/ld+json"
