@@ -12,8 +12,7 @@ type Fields = {
   phone: string;
   suburb: string;
   postcode: string;
-  apptDate: string;
-  apptTime: string;
+  timeline: string;
 };
 
 type Errors = Partial<Record<keyof Fields, string>>;
@@ -26,17 +25,8 @@ const EMPTY: Fields = {
   phone: "",
   suburb: "",
   postcode: "",
-  apptDate: "",
-  apptTime: "",
+  timeline: "",
 };
-
-// Local YYYY-MM-DD for the date input's min — toISOString() would give the
-// UTC date, which is the previous day for AEST mornings.
-function todayLocal() {
-  const d = new Date();
-  const p = (n: number) => String(n).padStart(2, "0");
-  return `${d.getFullYear()}-${p(d.getMonth() + 1)}-${p(d.getDate())}`;
-}
 
 declare global {
   interface Window {
@@ -86,6 +76,7 @@ export function VeneersForm() {
   const phoneRef = useRef<HTMLInputElement>(null);
   const suburbRef = useRef<HTMLInputElement>(null);
   const postcodeRef = useRef<HTMLInputElement>(null);
+  const timelineRef = useRef<HTMLSelectElement>(null);
   const honeypot = useRef<HTMLInputElement>(null);
   const advanced = useRef(false);
 
@@ -144,12 +135,14 @@ export function VeneersForm() {
     if (!values.suburb.trim()) next.suburb = "Please enter your suburb.";
     if (!/^\d{4}$/.test(values.postcode.trim()))
       next.postcode = "Please enter a 4-digit postcode.";
+    if (!values.timeline) next.timeline = "Please choose an option.";
     setErrors(next);
     if (next.name) return nameRef.current?.focus();
     if (next.email) return emailRef.current?.focus();
     if (next.phone) return phoneRef.current?.focus();
     if (next.suburb) return suburbRef.current?.focus();
     if (next.postcode) return postcodeRef.current?.focus();
+    if (next.timeline) return timelineRef.current?.focus();
 
     const payload = {
       name: values.name.trim(),
@@ -159,8 +152,7 @@ export function VeneersForm() {
       postcode: values.postcode.trim(),
       employment: values.employment,
       funding: values.funding,
-      apptDate: values.apptDate,
-      apptTime: values.apptTime,
+      timeline: values.timeline,
       ...getTracking(),
     };
 
@@ -422,41 +414,31 @@ export function VeneersForm() {
             </div>
           </div>
 
-          <div className="frow">
-            <div className="field">
-              <label htmlFor="apptDate">
-                Preferred date{" "}
-                <span className="field-optional">(optional)</span>
-              </label>
-              <input
-                type="date"
-                id="apptDate"
-                name="apptDate"
-                min={todayLocal()}
-                value={values.apptDate}
-                onChange={set("apptDate")}
-              />
-            </div>
-
-            <div className="field">
-              <label htmlFor="apptTime">
-                Preferred time{" "}
-                <span className="field-optional">(optional)</span>
-              </label>
-              <select
-                id="apptTime"
-                name="apptTime"
-                value={values.apptTime}
-                onChange={set("apptTime")}
-              >
-                <option value="" disabled>
-                  Select a time
-                </option>
-                {FORM.apptTimeOptions.map((o) => (
-                  <option key={o}>{o}</option>
-                ))}
-              </select>
-            </div>
+          <div className="field">
+            <label htmlFor="timeline">
+              {FORM.timelineLabel} <span className="req">*</span>
+            </label>
+            <select
+              id="timeline"
+              name="timeline"
+              ref={timelineRef}
+              value={values.timeline}
+              onChange={set("timeline")}
+              aria-invalid={!!errors.timeline}
+              aria-describedby={errors.timeline ? "err-timeline" : undefined}
+            >
+              <option value="" disabled>
+                Please select
+              </option>
+              {FORM.timelineOptions.map((o) => (
+                <option key={o}>{o}</option>
+              ))}
+            </select>
+            {errors.timeline && (
+              <span className="field-error" id="err-timeline">
+                {errors.timeline}
+              </span>
+            )}
           </div>
 
           {/* Honeypot — hidden from users, catches bots */}

@@ -139,6 +139,22 @@ section {
   gap: 10px;
   font-weight: 400;
 }
+.hero .eyebrow {
+  font-size: 0.82rem;
+  letter-spacing: 0.16em;
+  flex-wrap: wrap;
+  white-space: nowrap;
+}
+.hero .eyebrow .eb-loc {
+  color: #000;
+}
+/* The line wraps on narrow screens; a dangling separator at the end of the
+   first line reads as a typo, and the flex gap already does the job. */
+@media (max-width: 700px) {
+  .hero .eyebrow .eb-sep {
+    display: none;
+  }
+}
 .eyebrow::before {
   content: "";
   width: 26px;
@@ -289,7 +305,8 @@ section {
   margin-bottom: 2px;
 }
 .header-phone .hp-num {
-  font-size: 1.06rem;
+  font-size: 1.14rem;
+  font-weight: 600;
   line-height: 1;
   white-space: nowrap;
 }
@@ -1306,7 +1323,7 @@ section {
     display: none;
   }
   .header-phone .hp-num {
-    font-size: 1rem;
+    font-size: 1.06rem;
   }
   .doc-float {
     right: -14px;

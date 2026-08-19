@@ -52,9 +52,6 @@ function str(v: unknown, max = 120) {
 }
 
 function buildMessage(lead: Lead) {
-  const when = [str(lead.apptDate), str(lead.apptTime)]
-    .filter(Boolean)
-    .join(" ");
   const where = [str(lead.suburb), str(lead.postcode)]
     .filter(Boolean)
     .join(" ");
@@ -64,7 +61,7 @@ function buildMessage(lead: Lead) {
     `Phone: ${str(lead.phone)}`,
     `Email: ${str(lead.email)}`,
     where ? `Suburb: ${where}` : "",
-    when ? `Prefers: ${when}` : "",
+    str(lead.timeline) ? `Timeline: ${str(lead.timeline)}` : "",
     str(lead.funding) ? `Funding: ${str(lead.funding)}` : "",
     str(lead.employment) ? `Employment: ${str(lead.employment)}` : "",
   ]
@@ -79,8 +76,7 @@ const EMAIL_ROWS: [string, string][] = [
   ["Email", "email"],
   ["Suburb", "suburb"],
   ["Postcode", "postcode"],
-  ["Preferred date", "apptDate"],
-  ["Preferred time", "apptTime"],
+  ["Timeline", "timeline"],
   ["Employment", "employment"],
   ["Funding", "funding"],
   ["Source", "utm_source"],

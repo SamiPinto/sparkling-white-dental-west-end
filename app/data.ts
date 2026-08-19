@@ -36,7 +36,8 @@ export const TRACKING = {
 };
 
 export const HERO = {
-  eyebrow: "Porcelain Veneers · West End (Brisbane)",
+  eyebrow: "Porcelain Veneers",
+  eyebrowLocation: "West End (Brisbane)",
   headline: "Love the Smile You See in the",
   headlineAccent: "Mirror",
   hook: "Do you hide your smile?",
@@ -176,14 +177,14 @@ export const FAQS = {
     },
     {
       q: "How soon can I get an appointment?",
-      a: "Leave your details below with your preferred date, and our West End team will call you back the same day to confirm.",
+      a: "Leave your details below and our West End team will call you back the same day to confirm.",
     },
   ],
 };
 
 export const FORM = {
   heading: "Book Your Free Veneers Consultation",
-  sub: "Tell us a little about you and your preferred appointment time — our West End team will call to confirm.",
+  sub: "Tell us a little about you and when you'd like to start — our West End team will call to confirm.",
   step1Note: "No obligation. This just helps us prepare for your call.",
   step2Note: "No obligation. We never share your details.",
   submitLabel: "Book My Free Consultation",
@@ -206,10 +207,11 @@ export const FORM = {
     "I can pay upfront",
     "Not sure yet — I'd like to discuss options",
   ],
-  apptTimeOptions: [
-    "Morning (9am-12pm)",
-    "Afternoon (12pm-3pm)",
-    "Late afternoon (3pm-6pm)",
+  timelineLabel: "How soon would you like your confident smile?",
+  timelineOptions: [
+    "As soon as possible",
+    "0–3 months",
+    "3–6 months",
   ],
 };
 

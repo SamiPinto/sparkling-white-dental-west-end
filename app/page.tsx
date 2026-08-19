@@ -39,7 +39,11 @@ export default function VeneersLanding() {
       <section className="hero">
         <div className="container">
           <div className="hero-content hero-anim">
-            <span className="eyebrow">{HERO.eyebrow}</span>
+            <span className="eyebrow">
+              {HERO.eyebrow}
+              <span className="eb-sep" aria-hidden="true">·</span>
+              <span className="eb-loc">{HERO.eyebrowLocation}</span>
+            </span>
             <h1>
               {HERO.headline}{" "}
               <span className="accent">{HERO.headlineAccent}</span>
