@@ -1,9 +1,34 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import type { CSSProperties, ReactNode } from "react";
 import { BIZ } from "../app/data";
 import { Icon } from "./icons";
 import { reportPhoneClick } from "../lib/tracking";
+
+// Wraps a tel: link with click tracking. Server Components (app/page.tsx)
+// can't attach onClick handlers to host elements directly — this client
+// component is the boundary that lets them render a tracked phone link.
+export function PhoneLink({
+  className,
+  style,
+  children,
+}: {
+  className?: string;
+  style?: CSSProperties;
+  children: ReactNode;
+}) {
+  return (
+    <a
+      href={BIZ.phoneHref}
+      className={className}
+      style={style}
+      onClick={reportPhoneClick}
+    >
+      {children}
+    </a>
+  );
+}
 
 // Minimal landing-page header: logo + click-to-call only.
 // No nav links by design — every exit path costs form conversions.
