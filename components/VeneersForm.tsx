@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BIZ, FORM, TRACKING } from "../app/data";
 import { Icon } from "./icons";
+import { reportPhoneClick } from "../lib/tracking";
 
 type Fields = {
   employment: string;
@@ -203,7 +204,11 @@ export function VeneersForm() {
           </div>
           <h2>{FORM.successHeading}</h2>
           <p>{FORM.successBody}</p>
-          <a href={BIZ.phoneHref} className="btn btn--ghost fs-phone">
+          <a
+            href={BIZ.phoneHref}
+            className="btn btn--ghost fs-phone"
+            onClick={reportPhoneClick}
+          >
             <Icon name="phone" width={18} height={18} /> {BIZ.phone}
           </a>
         </div>

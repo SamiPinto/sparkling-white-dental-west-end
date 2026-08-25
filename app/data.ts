@@ -23,15 +23,17 @@ export const BIZ = {
 //                calls window.gtag and no conversion can fire.
 //   gadsSendTo : Google Ads conversion label, e.g. "AW-XXXX/abcd". Fired on
 //                form submit. Needs gadsId set too.
+//   gadsPhoneSendTo: Google Ads conversion label for tel: link clicks.
+//                Needs gadsId set too. See lib/tracking.ts.
 //   formEndpoint: where the lead is POSTed. Empty = console log only.
-// gadsSendTo stays empty until the client supplies it. The endpoint is
-// our own route — it sends the instant SMS; see app/api/lead/route.ts for the
-// env vars it needs.
+// The endpoint is our own route — it sends the instant SMS; see
+// app/api/lead/route.ts for the env vars it needs.
 // ---------------------------------------------------------------
 export const TRACKING = {
   fbPixelId: "425647446643014",
   gadsId: "AW-18327065331",
-  gadsSendTo: "",
+  gadsSendTo: "AW-18327065331/_P2nCOzZkNccEPOlg6NE",
+  gadsPhoneSendTo: "AW-18327065331/c5MVCMPCnOccEPOlg6NE",
   formEndpoint: "/api/lead",
 };
 

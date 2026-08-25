@@ -3,6 +3,7 @@
 import { useEffect, useState } from "react";
 import { BIZ } from "../app/data";
 import { Icon } from "./icons";
+import { reportPhoneClick } from "../lib/tracking";
 
 // Minimal landing-page header: logo + click-to-call only.
 // No nav links by design — every exit path costs form conversions.
@@ -29,6 +30,7 @@ export function Header() {
             href={BIZ.phoneHref}
             className="header-phone"
             aria-label={`Call the clinic on ${BIZ.phone}`}
+            onClick={reportPhoneClick}
           >
             <Icon name="phone" width={22} height={22} />
             <span className="hp-text">
@@ -48,7 +50,11 @@ export function Header() {
 export function MobileCTA() {
   return (
     <div className="mobile-cta">
-      <a href={BIZ.phoneHref} className="btn btn--ghost">
+      <a
+        href={BIZ.phoneHref}
+        className="btn btn--ghost"
+        onClick={reportPhoneClick}
+      >
         <Icon name="phone" width={18} height={18} /> Call
       </a>
       <a href="#book" className="btn">

@@ -13,6 +13,7 @@ import { Icon } from "../components/icons";
 import { Header, MobileCTA, ScrollReveal } from "../components/SiteChrome";
 import { VeneersForm } from "../components/VeneersForm";
 import { BeforeAfterSlider } from "../components/BeforeAfterSlider";
+import { reportPhoneClick } from "../lib/tracking";
 
 export default function VeneersLanding() {
   return (
@@ -184,7 +185,11 @@ export default function VeneersLanding() {
                 <Icon name="calendar" width={20} height={20} /> Book My Free
                 Consultation
               </a>
-              <a href={BIZ.phoneHref} className="btn btn--ghost btn--lg">
+              <a
+                href={BIZ.phoneHref}
+                className="btn btn--ghost btn--lg"
+                onClick={reportPhoneClick}
+              >
                 <Icon name="phone" width={18} height={18} /> {BIZ.phone}
               </a>
             </div>
@@ -294,6 +299,7 @@ export default function VeneersLanding() {
               href={BIZ.phoneHref}
               className="btn btn--lg"
               style={{ background: "rgba(255,255,255,0.12)", boxShadow: "none" }}
+              onClick={reportPhoneClick}
             >
               <Icon name="phone" width={18} height={18} /> {BIZ.phone}
             </a>
@@ -311,7 +317,9 @@ export default function VeneersLanding() {
             {BIZ.name} — {BIZ.locationDisplay}
           </span>
           <span className="f-sep">|</span>
-          <a href={BIZ.phoneHref}>{BIZ.phone}</a>
+          <a href={BIZ.phoneHref} onClick={reportPhoneClick}>
+            {BIZ.phone}
+          </a>
           <span className="f-sep">|</span>
           <span>{BIZ.address}</span>
         </div>
