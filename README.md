@@ -29,7 +29,7 @@ Buttons use the site's pill shape (~28–30px radius).
 - **Doctify "Recommended by patients" badge** in the trust strip
 - 8-service grid, **real team photo** in the About section, stats band
 - **Video tour** (the practice's Vimeo film) embedded in a framed player
-- Payment-plans with **real provider logos** (DentiCare, Afterpay, Humm, Medicare/CDBS)
+- Payment-plan messaging (no provider names or logos rendered; `pay-*` assets in `/public/images` are unused)
 - Emergency call-out, **live Doctify verified-reviews carousel** (4.98★), live map, FAQ accordion, final CTA
 - Full SEO metadata + Open Graph, `en-AU`, statically prerendered
 - Accessible: reduced-motion support, semantic landmarks, keyboard-friendly
@@ -42,7 +42,7 @@ Buttons use the site's pill shape (~28–30px radius).
 | `dentist-west-end.jpg` | Full West End team (compressed 34 MB → ~0.3 MB) | About |
 | `doctify-badge.png` | Doctify recommendation badge | Trust strip |
 | `logo.webp` | Practice logo (now served locally) | Header / footer |
-| `pay-*.png/webp` | DentiCare, Afterpay, Humm, Medicare | Payments |
+| `pay-*.png/webp` | Unused — no payment logos are rendered | Payments |
 | Vimeo `988732252` | "West End – Sparkling White Dental" tour | Video section |
 
 ## SEO (built in)
