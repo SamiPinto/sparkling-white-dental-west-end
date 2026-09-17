@@ -3,7 +3,7 @@
 import { useEffect, useRef, useState } from "react";
 import { BIZ, FORM, TRACKING } from "../app/data";
 import { Icon } from "./icons";
-import { reportPhoneClick } from "../lib/tracking";
+import { handOffLead } from "../lib/tracking";
 
 type Fields = {
   employment: string;
@@ -28,14 +28,6 @@ const EMPTY: Fields = {
   postcode: "",
   timeline: "",
 };
-
-declare global {
-  interface Window {
-    fbq?: (...args: unknown[]) => void;
-    gtag?: (...args: unknown[]) => void;
-    _fbq?: unknown;
-  }
-}
 
 // Campaign attribution — carried through to the lead payload so the
 // clinic can see which ad produced the callback request.
@@ -67,7 +59,6 @@ export function VeneersForm() {
   const [values, setValues] = useState<Fields>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [submitting, setSubmitting] = useState(false);
-  const [done, setDone] = useState(false);
   const [failed, setFailed] = useState(false);
 
   const employmentRef = useRef<HTMLSelectElement>(null);
@@ -80,25 +71,6 @@ export function VeneersForm() {
   const timelineRef = useRef<HTMLSelectElement>(null);
   const honeypot = useRef<HTMLInputElement>(null);
   const advanced = useRef(false);
-
-  // Meta Pixel bootstrap. No-ops until a pixel id is configured.
-  useEffect(() => {
-    if (!TRACKING.fbPixelId || window.fbq) return;
-    const n: any = (window.fbq = function (...args: unknown[]) {
-      n.callMethod ? n.callMethod.apply(n, args) : n.queue.push(args);
-    });
-    if (!window._fbq) window._fbq = n;
-    n.push = n;
-    n.loaded = true;
-    n.version = "2.0";
-    n.queue = [];
-    const t = document.createElement("script");
-    t.async = true;
-    t.src = "https://connect.facebook.net/en_US/fbevents.js";
-    document.head.appendChild(t);
-    window.fbq("init", TRACKING.fbPixelId);
-    window.fbq("track", "PageView");
-  }, []);
 
   // Move focus to the first field of step 2 once the user advances.
   useEffect(() => {
@@ -175,45 +147,14 @@ export function VeneersForm() {
         );
         await new Promise((r) => setTimeout(r, 400));
       }
-      try {
-        window.fbq?.("track", "Lead", {
-          location: BIZ.location,
-          service: "Veneers",
-        });
-      } catch {}
-      try {
-        if (TRACKING.gadsSendTo)
-          window.gtag?.("event", "conversion", {
-            send_to: TRACKING.gadsSendTo,
-          });
-      } catch {}
-      setDone(true);
+      // Leave `submitting` set so the button can't be pressed again while the
+      // browser navigates away.
+      handOffLead();
     } catch (err) {
       console.error(err);
       setFailed(true);
       setSubmitting(false);
     }
-  }
-
-  if (done) {
-    return (
-      <div className="form-card">
-        <div className="form-success" role="status">
-          <div className="ck">
-            <Icon name="check" width={30} height={30} strokeWidth={2.4} />
-          </div>
-          <h2>{FORM.successHeading}</h2>
-          <p>{FORM.successBody}</p>
-          <a
-            href={BIZ.phoneHref}
-            className="btn btn--ghost fs-phone"
-            onClick={reportPhoneClick}
-          >
-            <Icon name="phone" width={18} height={18} /> {BIZ.phone}
-          </a>
-        </div>
-      </div>
-    );
   }
 
   return (

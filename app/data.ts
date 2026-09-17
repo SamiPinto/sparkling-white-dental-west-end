@@ -18,11 +18,11 @@ export const BIZ = {
 
 // ---------------------------------------------------------------
 // TRACKING / FORM CONFIG — the only place to wire these up.
-//   fbPixelId  : Meta Pixel ID. Fires PageView + Lead on submit.
+//   fbPixelId  : Meta Pixel ID. Fires PageView; Lead fires on /thank-you.
 //   gadsId     : Google Ads account id. Loads gtag.js; without it nothing
 //                calls window.gtag and no conversion can fire.
 //   gadsSendTo : Google Ads conversion label, e.g. "AW-XXXX/abcd". Fired on
-//                form submit. Needs gadsId set too.
+//                /thank-you after a submit. Needs gadsId set too.
 //   gadsPhoneSendTo: Google Ads conversion label for tel: link clicks.
 //                Needs gadsId set too. See lib/tracking.ts.
 //   formEndpoint: where the lead is POSTed. Empty = console log only.

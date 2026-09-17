@@ -1,11 +1,51 @@
 import type { MouseEvent } from "react";
-import { TRACKING } from "../app/data";
+import { BIZ, TRACKING } from "../app/data";
 
 declare global {
   interface Window {
     fbq?: (...args: unknown[]) => void;
     gtag?: (...args: unknown[]) => void;
   }
+}
+
+export const THANK_YOU_PATH = "/thank-you";
+const LEAD_KEY = "swd_lead";
+
+// The form hands a one-time lead id to the thank-you page, which fires the
+// Lead / conversion events and then burns the id. Refreshes, back-button
+// visits and people opening /thank-you directly therefore never count.
+export function handOffLead() {
+  const id = `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 10)}`;
+  try {
+    sessionStorage.setItem(LEAD_KEY, id);
+  } catch {}
+  window.location.assign(THANK_YOU_PATH);
+}
+
+export function reportLead() {
+  let id: string | null = null;
+  try {
+    id = sessionStorage.getItem(LEAD_KEY);
+    sessionStorage.removeItem(LEAD_KEY);
+  } catch {}
+  if (!id) return false;
+
+  try {
+    window.fbq?.(
+      "track",
+      "Lead",
+      { location: BIZ.location, service: "Veneers" },
+      { eventID: id }
+    );
+  } catch {}
+  try {
+    if (TRACKING.gadsSendTo)
+      window.gtag?.("event", "conversion", {
+        send_to: TRACKING.gadsSendTo,
+        transaction_id: id,
+      });
+  } catch {}
+  return true;
 }
 
 // Click handler for every tel: link. Reports the click to both ad platforms

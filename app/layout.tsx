@@ -155,38 +155,39 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en-AU" className={`${playfair.variable} ${questrial.variable}`}>
+      {/* Tag bootstraps run inline in <head> so window.fbq / window.gtag exist
+          before hydration — the thank-you page reports the lead on mount. */}
+      <head>
+        {TRACKING.fbPixelId && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `!function(f,b,e,v,n,t,s){if(f.fbq)return;n=f.fbq=function(){n.callMethod?n.callMethod.apply(n,arguments):n.queue.push(arguments)};if(!f._fbq)f._fbq=n;n.push=n;n.loaded=!0;n.version='2.0';n.queue=[];t=b.createElement(e);t.async=!0;t.src=v;s=b.getElementsByTagName(e)[0];s.parentNode.insertBefore(t,s)}(window,document,'script','https://connect.facebook.net/en_US/fbevents.js');
+fbq('init','${TRACKING.fbPixelId}');
+fbq('track','PageView');`,
+            }}
+          />
+        )}
+        {TRACKING.gadsId && (
+          <script
+            dangerouslySetInnerHTML={{
+              __html: `window.dataLayer=window.dataLayer||[];
+function gtag(){dataLayer.push(arguments);}
+gtag('js',new Date());
+gtag('config','${TRACKING.gadsId}');`,
+            }}
+          />
+        )}
+      </head>
       <body>
         <noscript>
           <style>{`.reveal{opacity:1 !important;transform:none !important}`}</style>
         </noscript>
         {children}
-        {/* Meta Pixel fallback for visitors with JS disabled — the pixel
-            itself is bootstrapped in VeneersForm. */}
-        {TRACKING.fbPixelId && (
-          <noscript>
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              height="1"
-              width="1"
-              style={{ display: "none" }}
-              alt=""
-              src={`https://www.facebook.com/tr?id=${TRACKING.fbPixelId}&ev=PageView&noscript=1`}
-            />
-          </noscript>
-        )}
         {TRACKING.gadsId && (
-          <>
-            <Script
-              src={`https://www.googletagmanager.com/gtag/js?id=${TRACKING.gadsId}`}
-              strategy="afterInteractive"
-            />
-            <Script id="gtag-init" strategy="afterInteractive">
-              {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', '${TRACKING.gadsId}');`}
-            </Script>
-          </>
+          <Script
+            src={`https://www.googletagmanager.com/gtag/js?id=${TRACKING.gadsId}`}
+            strategy="afterInteractive"
+          />
         )}
         <script
           type="application/ld+json"

@@ -4,7 +4,15 @@ import { useEffect, useState } from "react";
 import type { CSSProperties, ReactNode } from "react";
 import { BIZ } from "../app/data";
 import { Icon } from "./icons";
-import { reportPhoneClick } from "../lib/tracking";
+import { reportLead, reportPhoneClick } from "../lib/tracking";
+
+// Fires the lead conversion on the thank-you page — once per real submission.
+export function LeadConversion() {
+  useEffect(() => {
+    reportLead();
+  }, []);
+  return null;
+}
 
 // Wraps a tel: link with click tracking. Server Components (app/page.tsx)
 // can't attach onClick handlers to host elements directly — this client
