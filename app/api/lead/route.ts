@@ -18,6 +18,7 @@ export const dynamic = "force-dynamic";
 // Required env (set in Vercel, never committed — .env*.local is gitignored):
 //   email:  SMTP_HOST, SMTP_PORT, SMTP_USER, SMTP_PASS, LEAD_EMAIL_TO
 //           LEAD_EMAIL_FROM is optional and defaults to SMTP_USER.
+//           LEAD_EMAIL_CC is optional and defaults to the Shopa team below.
 //   sheet:  SHEETS_WEBHOOK_URL  the Apps Script web app /exec URL
 //           SHEETS_TOKEN        shared secret the script checks
 //   sms:    SMS_PROVIDER  "ghl" | "clicksend" | "twilio"
@@ -106,6 +107,13 @@ async function sendEmail(lead: Lead) {
     .split(",")
     .map((a) => a.trim())
     .filter(Boolean);
+  const cc = (
+    process.env.LEAD_EMAIL_CC ??
+    "chad@shopamarketing.com,neil@shopamarketing.com"
+  )
+    .split(",")
+    .map((a) => a.trim())
+    .filter(Boolean);
 
   if (!host || !user || !pass || to.length === 0) return false;
 
@@ -148,6 +156,7 @@ ${rows
   await transporter.sendMail({
     from: process.env.LEAD_EMAIL_FROM || user,
     to,
+    cc,
     // Reply goes to the patient, so the team can answer straight from the alert.
     replyTo: str(lead.email) || undefined,
     subject: `New Veneers Lead — ${BIZ.location} — ${
